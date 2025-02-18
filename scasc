@@ -1,36 +1,45 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Proyecto.Vistas.login"
-             Title="Crear tu cuenta">
-    <ScrollView>
-        <StackLayout Padding="30" Spacing="20" BackgroundColor="#F5F5F5">
-            <Frame CornerRadius="10" Padding="20" BackgroundColor="White" HasShadow="True">
-                <StackLayout Spacing="15">
-                    <Label Text="Crear tu Cuenta" FontSize="Large" FontAttributes="Bold" HorizontalOptions="Center" />
+using System.Windows.Input;
 
-                    <Label Text="Nombre" FontSize="Medium" />
-                    <Entry x:Name="NombreEntry" Placeholder="Ingresa tu nombre" BackgroundColor="#EFEFEF" />
+namespace Proyecto.Vistas;
 
-                    <Label Text="Apellidos" FontSize="Medium" />
-                    <Entry x:Name="ApellidosEntry" Placeholder="Ingresa tus apellidos" BackgroundColor="#EFEFEF" />
+public partial class login : ContentPage
+{
+	ICommand irCommand { get; set; }
+	public login()
+	{
+		InitializeComponent();
+		irCommand = new Command(ir);
+		BindingContext = this;
+	}
 
-                    <Label Text="Correo Electrónico" FontSize="Medium" />
-                    <Entry x:Name="CorreoEntry" Placeholder="Ingresa tu correo" Keyboard="Email" BackgroundColor="#EFEFEF" />
+	public async void ir()
+	{
+        string nombre = NombreEntry.Text;
+        string apellidos = ApellidosEntry.Text;
+        string correo = CorreoEntry.Text;
+        string contraseña = PasswordEntry.Text;
+        string confirmarContraseña = ConfirmPasswordEntry.Text;
 
-                    <Label Text="Contraseña" FontSize="Medium" />
-                    <Entry x:Name="PasswordEntry" Placeholder="Ingresa tu contraseña" IsPassword="True" BackgroundColor="#EFEFEF" />
+        if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(apellidos) ||
+            string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contraseña))
+        {
+            await DisplayAlert("Error", "Todos los campos son obligatorios.", "OK");
+            return;
+        }
 
-                    <Label Text="Confirmar Contraseña" FontSize="Medium" />
-                    <Entry x:Name="ConfirmPasswordEntry" Placeholder="Confirma tu contraseña" IsPassword="True" BackgroundColor="#EFEFEF" />
+        if (contraseña != confirmarContraseña)
+        {
+            await DisplayAlert("Error", "Las contraseñas no coinciden.", "OK");
+            return;
+        }
 
-                    <Label Text="Aceptar terminos y condiciones"/>
-                    <CheckBox x:Name="chkTerminos"/>
+        // Validar que el CheckBox esté marcado
+        if (!chkTerminos.IsChecked)
+        {
+            await DisplayAlert("Error", "Debes aceptar los términos y condiciones.", "OK");
+            return;
+        }
 
-                    <Button Text="Registrar" BackgroundColor="#4CAF50" TextColor="White" CornerRadius="25" Padding="10" FontAttributes="Bold"
-                            Command="{Binding irCommand}"/>
-                </StackLayout>
-            </Frame>
-        </StackLayout>
-    </ScrollView>
-</ContentPage>
+        await Shell.Current.GoToAsync($"MainPage");
+	}
+}
