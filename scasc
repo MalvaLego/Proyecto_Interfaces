@@ -1,45 +1,42 @@
-using System.Windows.Input;
-
-namespace Proyecto.Vistas;
-
-public partial class login : ContentPage
+private async void btnClicked(object sender, EventArgs e)
 {
-	ICommand irCommand { get; set; }
-	public login()
-	{
-		InitializeComponent();
-		irCommand = new Command(ir);
-		BindingContext = this;
-	}
+    string nombre = NombreEntry.Text;
+    string apellidos = ApellidosEntry.Text;
+    string correo = CorreoEntry.Text;
+    string contraseña = PasswordEntry.Text;
+    string confirmarContraseña = ConfirmPasswordEntry.Text;
 
-	public async void ir()
-	{
-        string nombre = NombreEntry.Text;
-        string apellidos = ApellidosEntry.Text;
-        string correo = CorreoEntry.Text;
-        string contraseña = PasswordEntry.Text;
-        string confirmarContraseña = ConfirmPasswordEntry.Text;
+    if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(apellidos) ||
+        string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contraseña))
+    {
+        await DisplayAlert("Error", "Todos los campos son obligatorios.", "OK");
+        return;
+    }
 
-        if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(apellidos) ||
-            string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contraseña))
-        {
-            await DisplayAlert("Error", "Todos los campos son obligatorios.", "OK");
-            return;
-        }
+    if (!correo.Contains("@") || !correo.Contains(".") || correo.IndexOf(".") < correo.IndexOf("@"))
+    {
+        await DisplayAlert("Error", "El correo electrónico no parece válido.", "OK");
+        return;
+    }
 
-        if (contraseña != confirmarContraseña)
-        {
-            await DisplayAlert("Error", "Las contraseñas no coinciden.", "OK");
-            return;
-        }
+    if (contraseña.Length < 6)
+    {
+        await DisplayAlert("Error", "La contraseña debe tener al menos 6 caracteres.", "OK");
+        return;
+    }
 
-        // Validar que el CheckBox esté marcado
-        if (!chkTerminos.IsChecked)
-        {
-            await DisplayAlert("Error", "Debes aceptar los términos y condiciones.", "OK");
-            return;
-        }
+    if (contraseña != confirmarContraseña)
+    {
+        await DisplayAlert("Error", "Las contraseñas no coinciden.", "OK");
+        return;
+    }
 
-        await Shell.Current.GoToAsync($"MainPage");
-	}
+    if (!chkTerminos.IsChecked)
+    {
+        await DisplayAlert("Error", "Debes aceptar los términos y condiciones.", "OK");
+        return;
+    }
+
+    await DisplayAlert("Éxito", "Tu cuenta ha sido creada con éxito.", "OK");
+    await Shell.Current.GoToAsync($"MainPage");
 }
